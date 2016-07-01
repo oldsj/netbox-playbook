@@ -1,8 +1,11 @@
 ---
+# Database administrator credentials
 db_admin_username: postgres
-db_admin_password: "@#$%agfHWRSAvytrqew87yt"
+db_admin_password: "postgres_password"
+
+# Netbox database credentials
 netbox_db_username: netbox
-netbox_db_password: "FDJHsdb%^346eDSGF"
+netbox_db_password: "netbox_db_password"
 netbox_db_database: netbox
 netbox_db_host: localhost
 # leave blank for default port
@@ -12,12 +15,12 @@ netbox_db_port:
 netbox_fqdn: localhost
 
 # Use the script located at netbox-playbook/generate_secret_key.py to generate a suitable key.
-netbox_secret_key: "zOpdppS%P0XWXCdrMK-Fn_%dl_naCOo+@FS&aou&w#We*B0drZ"
+netbox_secret_key: "aOpdppS%P0XWXCdrMK-Fn_%dl_naCOo+@FS&aou&w#We*B0drZ"
 
 # Admin user
-netbox_admin_name: "James Olds"
-netbox_admin_email: "james.olds@email.com"
+netbox_admin_name: "First Last"
+netbox_admin_email: "first.last@example.com"
 
 # Network device login
-netbox_user: 
-netbox_password:
+netbox_user: tacacs_user
+netbox_password: "tacacs_password"
