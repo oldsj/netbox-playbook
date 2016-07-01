@@ -1,0 +1,11 @@
+---
+
+- hosts: all
+  user: deploy
+  become: True
+  gather_facts: True
+  vars_files:
+    - vars/vars.yml
+
+  roles: 
+    - netbox

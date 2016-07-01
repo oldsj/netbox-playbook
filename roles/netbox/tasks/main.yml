@@ -1,0 +1,84 @@
+- name: Install netbox dependencies
+  apt: pkg={{ item }} state=present
+  with_items:
+    - postgresql
+    - libpq-dev 
+    - python-psycopg2
+    - git
+    - python-pip
+    - python-dev
+    - libxml2-dev 
+    - libxslt1-dev 
+    - libffi-dev 
+    - graphviz
+    - nginx
+    - gunicorn
+    - supervisor
+
+
+- name: Clone netbox git repository
+  git: repo=https://github.com/digitalocean/netbox.git
+       dest=/opt/netbox
+       version=master
+
+- name: Upgrade pip
+  pip: name=pip state=latest
+
+- name: Install pip dependencies
+  pip: requirements=/opt/netbox/requirements.txt
+
+- name: Set postgres password
+  command: >
+    sudo -u {{ db_admin_username }} psql -d {{ db_admin_username }} 
+    -c "ALTER USER postgres with  password '{{ db_admin_password }}';"
+
+- name: Create database user for netbox
+  postgresql_user: >
+    login_host=localhost login_user={{ db_admin_username }} 
+    login_password="{{ db_admin_password }}" name="{{ netbox_db_username }}"
+    password="{{ netbox_db_password }}" state=present
+
+- name: Create database for netbox
+  postgresql_db: >
+    login_host=localhost login_user={{ db_admin_username }} 
+    login_password="{{ db_admin_password }}" name={{ netbox_db_database }} 
+    state=present owner={{ netbox_db_username }}
+
+- name: Configure netbox
+  template:
+    src=roles/netbox/templates/configuration.py.j2
+    dest=/opt/netbox/netbox/netbox/configuration.py
+
+- name: Run migrations
+  command: /opt/netbox/netbox/manage.py migrate
+
+- name: Configure gunicorn
+  copy:
+    src=roles/netbox/files/gunicorn_config.py
+    dest=/opt/netbox/gunicorn_config.py
+  notify: restart supervisor
+
+- name: Configure supervisord
+  copy:
+    src=roles/netbox/files/netbox.conf
+    dest=/etc/supervisor/conf.d/netbox.conf
+  notify: restart supervisor
+
+- name: Configure nginx
+  template:
+    src=roles/netbox/templates/netbox.j2
+    dest=/etc/nginx/sites-available/netbox
+  notify: restart nginx
+  
+- name: Remove nginx default configuration
+  file: path=/etc/nginx/sites-enabled/default state=absent
+  notify: restart nginx
+
+- name: Enable netbox site in nginx
+  file: 
+    src=/etc/nginx/sites-available/netbox
+    dest=/etc/nginx/sites-enabled/netbox
+    state=link
+  notify: restart nginx
+
+
