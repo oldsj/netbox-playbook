@@ -9,6 +9,13 @@ Use the configuration guide at https://github.com/digitalocean/netbox/blob/devel
 
 For now this is configured to have ansible run from the host that will be running netbox
 
+- Create a user "deploy" and give it nopasswd access to sudo:
+```
+adduser deploy
+sudo visudo
+deploy ALL=(ALL) NOPASSWD:ALL
+```
+
 - Configure your fresh Ubuntu installation for SSH, and install ansible:
   ```
   apt-get install ansible
