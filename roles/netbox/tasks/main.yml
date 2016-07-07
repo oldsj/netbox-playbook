@@ -64,6 +64,9 @@
     dest=/etc/supervisor/conf.d/netbox.conf
   notify: restart supervisor
 
+- name: Enable supervisord
+  service: name=supervisor.service enabled=yes
+
 - name: Configure nginx
   template:
     src=roles/netbox/templates/netbox.j2
